@@ -1,9 +1,7 @@
 @minLength(3)
 @maxLength(11)
 param storagePrefix string
-
 param storageSKU string = 'Standard_LRS'
-
 param location string = resourceGroup().location
 
 @description('This is a storage container that captures incoming breadcrumb or rmisfiles.')
@@ -26,18 +24,26 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
     
   }
   
-  resource queue 'queueServices@2021-08-01' = {
+  resource queueServices 'queueServices@2021-08-01' existing = {
     name: 'default'
     
-    resource qservice 'queues' = {
+    resource queue 'queues' = {
       name: queueName
     }
   }
+
+  resource blobservices 'blobServices' existing = {
+    name: 'default'
+
+    resource container 'containers' = {
+      name: containerName
+    } 
+  } 
 }
 
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-08-01' = {
-  name: '${stg.name}/default/${containerName}'
-}
+//resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-08-01' = {
+//  name: '${stg.name}/default/${containerName}'
+//}
 
 //resource evntgrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
 //  name: 'enventsub'
