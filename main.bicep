@@ -23,19 +23,19 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   kind: 'StorageV2'
   properties:{
     supportsHttpsTrafficOnly: true
+    
   }
   
+  resource queue 'queueServices@2021-08-01' = {
+    name: queueName
+    properties: {
+      
+    }
+  }
 }
 
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-08-01' = {
   name: '${stg.name}/default/${containerName}'
-}
-
-resource queue  'Microsoft.Storage/storageAccounts/queueServices@2021-08-01' = {
-  name: queueName
-  parent: stg
-  
-
 }
 
 output storageEndpoint object = stg.properties.primaryEndpoints
