@@ -41,37 +41,33 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   } 
 }
 
-
-//resource evntgrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
-//  name: 'enventsub'
-//  scope: stg
-
-//  properties:{
-//    destination: {
-//      endpointType: 'StorageQueue'
-//      properties: {
-//        queueName: queueName
-//      }
-//    }
-//    eventDeliverySchema: 'EventGridSchema'
-//    filter: {
-//       advancedFilters: [
-//        {
-//          operatorType: 'StringEndsWith'
-//          values: [
-//            '.csv'
-//          ]
-//        }
-//      ]
-    //  includedEventTypes: [
-    //    'Microsoft.Storage.BlobCreated'
-     // ]
-//    }
-    
-//  }
-  
-
-//}
+resource egrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
+  name: 'esub'
+  scope: stg
+  properties: {
+    destination: {
+      endpointType: 'StorageQueue'
+      properties: {
+        queueName: queueName
+        resourceId: stg::queueServices::queue.id
+      }
+    }
+    eventDeliverySchema: 'EventGridSchema'
+    filter: {
+      includedEventTypes: [
+        'Microsoft.Storage.BlobCreated'
+      ]
+      advancedFilters: [
+        {
+          operatorType: 'StringEndsWith' 
+          values: [
+            '.csv'
+          ]
+        }
+      ]
+    }
+  }
+}
 
 output storageEndpoint object = stg.properties.primaryEndpoints
 
