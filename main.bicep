@@ -32,8 +32,9 @@ resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@20
 }
 
 resource queue  'Microsoft.Storage/storageAccounts/queueServices@2021-08-01' = {
-  name:queueName
+  name: queueName
   parent: stg
+  
 
 }
 
