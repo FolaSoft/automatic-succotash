@@ -41,9 +41,6 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   } 
 }
 
-//resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-08-01' = {
-//  name: '${stg.name}/default/${containerName}'
-//}
 
 //resource evntgrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
 //  name: 'enventsub'
