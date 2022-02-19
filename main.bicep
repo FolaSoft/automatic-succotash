@@ -14,7 +14,7 @@ param queueName string = 'rimsfiles'
 
 var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
 
-resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
+resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: uniqueStorageName
   location: location
   sku: {
@@ -24,18 +24,18 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   properties:{
     supportsHttpsTrafficOnly: true
   }
-
-  resource queue 'queueServices' = {
-    name: queueName
-  }
   
 }
 
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-08-01' = {
   name: '${stg.name}/default/${containerName}'
 }
 
+resource queue  'Microsoft.Storage/storageAccounts/queueServices@2021-08-01' = {
+  name:queueName
+  parent: stg
 
+}
 
 output storageEndpoint object = stg.properties.primaryEndpoints
 
