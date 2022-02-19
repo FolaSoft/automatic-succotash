@@ -25,9 +25,10 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
     supportsHttpsTrafficOnly: true
   }
 
-  resource queue 'queueServices@2021-08-01' = {
+  resource queue 'queueServices' = {
     name: queueName
   }
+  
 }
 
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
