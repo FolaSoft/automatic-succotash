@@ -60,9 +60,9 @@ resource evntgrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
           ]
         }
       ]
-      includedEventTypes: [
-        'Microsoft.Storage.BlobCreated'
-      ]
+    //  includedEventTypes: [
+    //    'Microsoft.Storage.BlobCreated'
+     // ]
     }
     
   }
