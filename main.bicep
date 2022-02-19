@@ -41,7 +41,7 @@ resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@20
 
 resource evntgrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
   name: 'enventsub'
-  scope: stg
+  scope: container
 
   properties:{
     destination: {
