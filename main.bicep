@@ -6,8 +6,11 @@ param storageSKU string = 'Standard_LRS'
 
 param location string = resourceGroup().location
 
-@description('This container captures incoming rmisfiles.')
+@description('This is a storage container that captures incoming breadcrumb or rmisfiles.')
 param containerName string = 'rmisfiles'
+
+@description('This is a storage queue which is the destination endpoint for storage event subscription')
+param queueName string = 'rimsfiles'
 
 var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
 
@@ -21,7 +24,12 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   properties:{
     supportsHttpsTrafficOnly: true
   }
+
+  resource queue 'queueServices@2021-08-01' = {
+    name: queueName
+  }
 }
+
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
   name: '${stg.name}/default/${containerName}'
 }
