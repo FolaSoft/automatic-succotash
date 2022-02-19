@@ -28,8 +28,9 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   
   resource queue 'queueServices@2021-08-01' = {
     name: queueName
-    properties: {
-      
+    
+    resource qservice 'queues' = {
+      name: 'testqueue'
     }
   }
 }
