@@ -10,7 +10,7 @@ param containerName string = 'rmisfiles'
 @description('This is a storage queue which is the destination endpoint for storage event subscription')
 param queueName string = 'rimsfiles'
 
-// Create unique string for storage assets 
+// Create unique string for storage name 
 var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
 
 // Deploy Azure Storage resource and setting its name property  to unique value 
