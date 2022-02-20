@@ -67,11 +67,9 @@ resource systopic 'Microsoft.EventGrid/systemTopics@2021-12-01' = {
   }
 }
 
-resource systemtopiceventsub 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
-  name: 'esubName'
-  dependsOn: [
-    systopic
-  ]
+resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2021-12-01' = {
+  parent: systopic
+  name: 'systopevnsub'
    properties: {
     destination: {
       endpointType: 'StorageQueue'
@@ -79,12 +77,11 @@ resource systemtopiceventsub 'Microsoft.EventGrid/eventSubscriptions@2021-12-01'
         queueName: queueName
         resourceId: stg.id
         //'/subscriptions/<subscription-id>/resourcegroups/<resource-group-name>/providers/Microsoft.Storage/storageAccounts/automaticsuccotash'
-        
       }
     }
     eventDeliverySchema: 'EventGridSchema'
       filter: {
-      enableAdvancedFilteringOnArrays: true
+      subjectBeginsWith: '/blobServices/default/containers/${stg::blobservices::container.name}'
       subjectEndsWith: '.csv' 
       includedEventTypes: [
         'Microsoft.Storage.BlobCreated'
