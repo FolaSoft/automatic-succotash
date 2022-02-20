@@ -53,20 +53,21 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   } 
 }
 
-resource egridtopic 'Microsoft.EventGrid/topics@2021-12-01'= {
-  name: 'egridtopicName'
-  location: location
-}
+//resource egridtopic 'Microsoft.EventGrid/topics@2021-12-01'= {
+//  name: 'egridtopicName'
+//  location: location
+//}
 
 resource egrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
   name: 'esubName'
-  scope: egridtopic
+  scope: stg::blobservices::container
   properties: {
     destination: {
       endpointType: 'StorageQueue'
-      properties: {
+      properties: { 
         queueName: queueName
-        resourceId: stg::queueServices::queue.id
+        resourceId: stg.id
+        
       }
     }
     eventDeliverySchema: 'EventGridSchema'
@@ -74,6 +75,7 @@ resource egrid 'Microsoft.EventGrid/eventSubscriptions@2021-12-01' = {
       includedEventTypes: [
         'Microsoft.Storage.BlobCreated'
       ]
+      enableAdvancedFilteringOnArrays: true
       advancedFilters: [
         {
           operatorType: 'StringEndsWith' 
