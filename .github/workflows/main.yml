@@ -6,7 +6,7 @@ name: Azure ARM
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main, biceps, StorageDeployment ]
+    branches: [ main, bicep, StorageDeployment ]
   pull_request:
     branches: [ main ]
 
