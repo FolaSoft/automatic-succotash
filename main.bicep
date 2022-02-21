@@ -10,8 +10,21 @@ param containerName string = 'rmisfiles'
 @description('This is a storage queue which is the destination endpoint for storage event subscription')
 param queueName string = 'rimsfiles'
 
+// function app creation variables
+//param functionRuntime string = 'dotnet'
+param appNamePrefix string = uniqueString(resourceGroup().id)
+// end of function app creation variables 
+
 // Create unique string for storage name.
 var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
+
+// Variable for app function 
+var appTags = {
+  AppID: 'myfunc'
+  AppName:'My Function App'
+}
+
+var storageAccountName = format('{0}sta', replace(appNamePrefix, '-', ''))
 
 // Deploy Azure Storage resource and setting its name property  to unique value 
 // The property uniqueStorageName is created using storage prefix literal 
@@ -59,10 +72,6 @@ resource systopic 'Microsoft.EventGrid/systemTopics@2021-12-01' = {
   properties: {
     source: stg.id
     topicType: 'Microsoft.Storage.StorageAccounts'
-    //Copying from UI creation
-    //Topic Type: Storage Account
-    //Source Resource: Storage name <automaticsuccotash2>
-    //Styem Topic Name* 'user defined string'
   }
 }
 
@@ -75,9 +84,9 @@ resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscription
        properties: { 
         queueName: queueName
         resourceId: stg.id
-        //'/subscriptions/<subscription-id>/resourcegroups/<resource-group-name>/providers/Microsoft.Storage/storageAccounts/automaticsuccotash'
       }
     }
+
     eventDeliverySchema: 'EventGridSchema'
       filter: {
       subjectBeginsWith: '/blobServices/default/containers/${stg::blobservices::container.name}'
@@ -85,6 +94,51 @@ resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscription
       includedEventTypes: [
         'Microsoft.Storage.BlobCreated'
       ]
+    }
+  }
+}
+
+// Storage Account for Function App 
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
+  name: storageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    encryption: {
+      services: {
+        file: {
+          keyType: 'Account'
+          enabled: true
+        }
+        blob: {
+          keyType: 'Account'
+          enabled: true
+        }
+      }
+      keySource: 'Microsoft.Storage'
+    }
+    accessTier: 'Hot'
+  }
+  tags: appTags
+}
+
+// Blob Services for Storage Account
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-08-01' = {
+  parent: storageAccount
+
+  name: 'default'
+  properties: {
+    cors:{
+      corsRules: []
+
+    }
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 7
     }
   }
 }
