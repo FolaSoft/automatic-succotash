@@ -11,7 +11,10 @@ param containerName string = 'rmisfiles'
 param queueName string = 'rimsfiles'
 
 // function app creation variables
-//param functionRuntime string = 'dotnet'
+param functionRuntime string = 'dotnet'
+param appNamePrefix string = uniqueString(resourceGroup().id)
+param workspaceResourceId string
+
 param appNamePrefix string = uniqueString(resourceGroup().id)
 // end of function app creation variables 
 
@@ -23,7 +26,8 @@ var appTags = {
   AppID: 'myfunc'
   AppName:'My Function App'
 }
-
+var appServiceName = '${appNamePrefix}-appservice'
+var appInsightsName = '${appNamePrefix}-appinsights'
 var storageAccountName = format('{0}sta', replace(appNamePrefix, '-', ''))
 
 // Deploy Azure Storage resource and setting its name property  to unique value 
@@ -141,6 +145,46 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-08-01
       days: 7
     }
   }
+}
+
+
+// App Insights resource
+resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
+  name: appInsightsName
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: workspaceResourceId
+    publicNetworkAccessForIngestion: 'Enabled'
+    publicNetworkAccessForQuery: 'Enabled'
+  }
+  tags: appTags
+}
+
+// App Service
+resource appService 'Microsoft.Web/serverFarms@2020-06-01' = {
+  name: appServiceName
+  location: location
+  kind: 'functionapp'
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+    size: 'Y1'
+    family: 'Y'
+    capacity: 0
+  }
+  properties: {
+    perSiteScaling: false
+    maximumElasticWorkerCount: 1
+    isSpot: false
+    reserved: false
+    isXenon: false
+    hyperV: false
+    targetWorkerCount: 0
+    targetWorkerSizeId: 0
+  }
+  tags: appTags
 }
 
 output storageEndpoint object = stg.properties.primaryEndpoints
