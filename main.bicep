@@ -53,9 +53,6 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   } 
 }
 
-<<<<<<< HEAD
-=======
-
 resource systopic 'Microsoft.EventGrid/systemTopics@2021-12-01' = {
   name: 'systopic'
   location: location
@@ -92,7 +89,6 @@ resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscription
   }
 }
 
->>>>>>> ab9939a1b3362bd0f313a64c1e196464acf9553b
 output storageEndpoint object = stg.properties.primaryEndpoints
 
 
