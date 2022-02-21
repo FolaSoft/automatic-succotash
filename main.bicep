@@ -11,11 +11,11 @@ param containerName string = 'rmisfiles'
 param queueName string = 'rimsfiles'
 
 // function app creation variables
-param functionRuntime string = 'dotnet'
+//param functionRuntime string = 'dotnet'
 param appNamePrefix string = uniqueString(resourceGroup().id)
 param workspaceResourceId string
 
-param appNamePrefix string = uniqueString(resourceGroup().id)
+
 // end of function app creation variables 
 
 // Create unique string for storage name.
