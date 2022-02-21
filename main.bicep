@@ -53,6 +53,46 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   } 
 }
 
+<<<<<<< HEAD
+=======
+
+resource systopic 'Microsoft.EventGrid/systemTopics@2021-12-01' = {
+  name: 'systopic'
+  location: location
+  properties: {
+    source: stg.id
+    topicType: 'Microsoft.Storage.StorageAccounts'
+    //Copying from UI creation
+    //Topic Type: Storage Account
+    //Source Resource: Storage name <automaticsuccotash2>
+    //Styem Topic Name* 'user defined string'
+  }
+}
+
+resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2021-12-01' = {
+  parent: systopic
+  name: 'systopevnsub'
+   properties: {
+    destination: {
+      endpointType: 'StorageQueue'
+       properties: { 
+        queueName: queueName
+        resourceId: stg.id
+        //'/subscriptions/<subscription-id>/resourcegroups/<resource-group-name>/providers/Microsoft.Storage/storageAccounts/automaticsuccotash'
+      }
+    }
+    eventDeliverySchema: 'EventGridSchema'
+      filter: {
+      subjectBeginsWith: '/blobServices/default/containers/${stg::blobservices::container.name}'
+      subjectEndsWith: '.csv' 
+      includedEventTypes: [
+        'Microsoft.Storage.BlobCreated'
+      ]
+    }
+  }
+}
+
+>>>>>>> ab9939a1b3362bd0f313a64c1e196464acf9553b
 output storageEndpoint object = stg.properties.primaryEndpoints
 
 
