@@ -34,6 +34,7 @@ jobs:
       - name: deploy
         uses: azure/arm-deploy@v1
         with:
+         deploymentName: ${{ github.run_number}}-deployment
          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
          resourceGroupName: ${{ secrets.AZURE_RG }}
          template: ./main.bicep
