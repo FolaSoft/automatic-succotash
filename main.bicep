@@ -13,7 +13,7 @@ param queueName string = 'rimsfiles'
 // function app creation variables
 //param functionRuntime string = 'dotnet'
 param appNamePrefix string = uniqueString(resourceGroup().id)
-param workspaceResourceId string
+//param workspaceResourceId string = 'la-${uniqueString(resourceGroup().id)}'
 
 
 // end of function app creation variables 
@@ -23,12 +23,14 @@ var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
 
 // Variable for app function 
 var appTags = {
-  AppID: 'myfunc'
-  AppName:'My Function App'
+  AppID: 'EIR #234'
+  AppName:'LDE Logical Delivery Events'
+  CostCenter: 'ITAS'
 }
 var appServiceName = '${appNamePrefix}-appservice'
 var appInsightsName = '${appNamePrefix}-appinsights'
 var storageAccountName = format('{0}sta', replace(appNamePrefix, '-', ''))
+var logAnalyticsWorkspaceName = '${appNamePrefix}-la-workspace'
 
 // Deploy Azure Storage resource and setting its name property  to unique value 
 // The property uniqueStorageName is created using storage prefix literal 
@@ -44,6 +46,8 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
     supportsHttpsTrafficOnly: true
     
   }
+  tags: appTags
+  
   //Deploy Azure Storage queues by setting queue services name property to 'default'
   //Then create the actuall storage queue resource with desired queue name 
   //E.g. setting value to 'rmifiles' will create a storage queue with queue name to rmifiles.
@@ -55,6 +59,7 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-08-01' = {
     resource queue 'queues' = {
       name: queueName
     }
+    
   }
 
   // Deploy Azure Storage blobs by setting blob servcies name property to 'defualt'
@@ -77,6 +82,7 @@ resource systopic 'Microsoft.EventGrid/systemTopics@2021-12-01' = {
     source: stg.id
     topicType: 'Microsoft.Storage.StorageAccounts'
   }
+  tags: appTags
 }
 
 resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2021-12-01' = {
@@ -147,15 +153,34 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-08-01
   }
 }
 
+// Log Analytics neede for App Insights instantiation
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+  name:  logAnalyticsWorkspaceName
+  location: location 
+  tags: appTags
+  properties: {
+    features: {
+      enableLogAccessUsingOnlyResourcePermissions: false
+      immediatePurgeDataOn30Days: true
+      
+    }
+    sku: {
+      name: 'PerGB2018'
+    }
+    workspaceCapping: {
+      dailyQuotaGb: 1
+    }
+  }
+}
 
 // App Insights resource
-resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
+resource appInsights  'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   location: location
   kind: 'web'
   properties: {
     Application_Type: 'web'
-    WorkspaceResourceId: workspaceResourceId
+    WorkspaceResourceId: logAnalyticsWorkspace.id
     publicNetworkAccessForIngestion: 'Enabled'
     publicNetworkAccessForQuery: 'Enabled'
   }
