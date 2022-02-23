@@ -108,7 +108,7 @@ resource systemtopiceventsub 'Microsoft.EventGrid/systemTopics/eventSubscription
   }
 }
 
-// Storage Account for Function App 
+// Storage Account for Function App .
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: storageAccountName
   location: location
@@ -144,7 +144,6 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-08-01
   properties: {
     cors:{
       corsRules: []
-
     }
     deleteRetentionPolicy: {
       enabled: true
@@ -162,11 +161,10 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
     features: {
       enableLogAccessUsingOnlyResourcePermissions: false
       immediatePurgeDataOn30Days: true
-      
     }
     sku: {
       name: 'PerGB2018'
-    }
+    } 
     workspaceCapping: {
       dailyQuotaGb: 1
     }
@@ -211,6 +209,17 @@ resource appService 'Microsoft.Web/serverFarms@2020-06-01' = {
   }
   tags: appTags
 }
+
+resource storage 'Microsoft.Storage/storageAccounts@2021-08-01' = {
+  name: 'mystorage'
+  location: location
+  sku: { 
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+}
+
+// Function App
 
 output storageEndpoint object = stg.properties.primaryEndpoints
 
